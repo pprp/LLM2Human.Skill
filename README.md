@@ -123,6 +123,78 @@ apparent expertise.
 
 ---
 
+## Using PROMPT.md — Universal Memory File
+
+`PROMPT.md` is a single self-contained file that encodes the full LLM2Human Distillation behavior. Paste it into any LLM's memory or system prompt to activate the skill without installing anything.
+
+### ChatGPT (GPT-4o / GPT-4)
+
+1. Open ChatGPT → click your profile → **Settings**
+2. Go to **Personalization → Memory**
+3. Click **Manage memories → Add a memory**
+4. Paste the full contents of `PROMPT.md`
+
+Or use it as a system prompt in the API:
+
+```python
+import openai, pathlib
+
+system_prompt = pathlib.Path("PROMPT.md").read_text()
+
+client = openai.OpenAI()
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "How does binary search work?"},
+    ],
+)
+print(response.choices[0].message.content)
+```
+
+### Google Gemini
+
+**Gemini Advanced (web):**
+1. Start a new conversation
+2. Click the **System instructions** field (gear icon or "+" in some interfaces)
+3. Paste the contents of `PROMPT.md`
+
+**Gemini API:**
+
+```python
+import google.generativeai as genai
+import pathlib
+
+system_prompt = pathlib.Path("PROMPT.md").read_text()
+
+genai.configure(api_key="YOUR_API_KEY")
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-pro",
+    system_instruction=system_prompt,
+)
+
+response = model.generate_content("How does binary search work?")
+print(response.text)
+```
+
+### Any other LLM or chat interface
+
+Paste `PROMPT.md` as the first message in your conversation, prefixed with:
+
+```
+Use the following as your operating instructions for this session:
+
+[paste PROMPT.md contents here]
+```
+
+### Skip the lens for a single response
+
+```
+[your question here] — skip the learning lens this time
+```
+
+---
+
 ## Installation in OpenAI Codex
 
 Codex does not have a native skill system, but you can apply LLM2Human Distillation as a **system prompt** in any Codex-powered tool (Codex CLI, API calls, or custom integrations).
